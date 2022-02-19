@@ -1,0 +1,112 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-buttons slot="start">
+            <ion-back-button text="Voltar" icon="" color="tertiary" fill="outline"></ion-back-button>
+        </ion-buttons>
+        <ion-title>
+            Perfil
+        </ion-title>
+        <ion-buttons slot="primary">
+            <ion-button color="primary-contrast" (click)="logout()">
+                <ion-icon slot="start" name="log-out"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <div class="">
+
+        <ion-card>
+
+            <img src="{{ user.image }}" alt="">
+
+            <ion-item class="text-center">
+                <label for="file">Mudar Foto</label>
+                <input (change)="onInputFileChange($event)" type="file" style="display: none;" id="file" [(ngModel)]="name" />
+            </ion-item>
+
+            <h4>Olá {{ user.name }}</h4>
+            <p>{{ user.about ? user.about : 'Sem descrição'}}</p>
+            <small><b>Idade: </b> {{ user.age }} anos </small>
+        </ion-card>
+
+        <ion-card>
+            <h4>Editar perfil</h4>
+
+
+            <ion-list>
+                <ion-item>
+                    <ion-label position="floating">Nome</ion-label>
+                    <ion-input type="text" [(ngModel)]="user.name"></ion-input>
+                </ion-item>
+                <ion-item>
+                    <ion-label position="floating">Nome de usuário</ion-label>
+                    <ion-input type="text" [(ngModel)]="user.username"></ion-input>
+                </ion-item>
+                <ion-item>
+                    <ion-label position="floating">Correio electrónico</ion-label>
+                    <ion-input type="text" [(ngModel)]="user.email"></ion-input>
+                </ion-item>
+
+                <ion-item>
+                    <ion-label position="floating">Telefone</ion-label>
+                    <ion-input type="text" [(ngModel)]="user.phone"></ion-input>
+                </ion-item>
+
+                <ion-item>
+                    <ion-label position="floating">Aniversário</ion-label>
+                    <ion-input type="date" displayFormat="MM DD YY" [(ngModel)]="user.birthday"></ion-input>
+                </ion-item>
+
+                <ion-list>
+
+                    <ion-radio-group [(ngModel)]="user.gender">
+                        <ion-list-header>
+                            <ion-label>
+                                <h3>Gênero</h3>
+                            </ion-label>
+                        </ion-list-header>
+
+                        <ion-row>
+                            <ion-col size="6">
+
+                                <ion-item>
+                                    <ion-label>Masculino</ion-label>
+                                    <ion-radio slot="start" value="Masculino"></ion-radio>
+                                </ion-item>
+
+                            </ion-col>
+                            <ion-col size="6">
+
+                                <ion-item>
+                                    <ion-label>Femenino</ion-label>
+                                    <ion-radio slot="start" value="Femenino"></ion-radio>
+                                </ion-item>
+
+                            </ion-col>
+                        </ion-row>
+
+                    </ion-radio-group>
+                </ion-list>
+
+                <ion-item>
+                    <ion-label position="floating ">Sobre...</ion-label>
+                    <ion-textarea [(ngModel)]="user.about "></ion-textarea>
+                </ion-item>
+                <hr>
+                <ion-item>
+                    <ion-label position="floating ">Chave de acesso</ion-label>
+                    <ion-input type="password " [(ngModel)]="user.password "></ion-input>
+                </ion-item>
+            </ion-list>
+
+
+        </ion-card>
+
+    </div>
+</ion-content>
+
+<ion-footer class="text-center ">
+    <ion-button expland="block " padding color="tertiary " (click)="updateUser() ">Atualizar conta</ion-button>
+</ion-footer>

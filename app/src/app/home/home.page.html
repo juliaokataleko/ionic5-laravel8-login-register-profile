@@ -1,0 +1,27 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-title>
+            {{ appName }}
+        </ion-title>
+        <ion-buttons slot="primary">
+            <ion-button color="primary-contrast" routerLink="/profile">
+                <ion-icon slot="start" name="person"></ion-icon>
+            </ion-button>
+            <!-- <ion-button color="primary-contrast" (click)="logout()">
+                <ion-icon slot="start" name="log-out"></ion-icon>
+            </ion-button> -->
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <div class="ion-padding">
+
+        <ion-card>
+            <img src="{{ user.image }}" alt="">
+            <h4>Olá {{ user.name }}</h4>
+            <p>{{ user.about ? user.about : 'Sem descrição'}}</p>
+        </ion-card>
+
+    </div>
+</ion-content>
