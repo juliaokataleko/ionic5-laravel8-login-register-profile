@@ -1,15 +1,19 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
+import { ActiveGuard } from './guards/ActiveGuard';
+import { AuthGuard } from './guards/AuthGuard';
 
 const routes: Routes = [
   {
     path: 'home',
-    loadChildren: () => import('./home/home.module').then( m => m.HomePageModule)
+    loadChildren: () => import('./home/home.module').then(m => m.HomePageModule),
+    canActivate: [AuthGuard, ActiveGuard]
   },
   {
     path: '',
     redirectTo: 'home',
-    pathMatch: 'full'
+    pathMatch: 'full',
+    
   },
   {
     path: 'login',
@@ -25,11 +29,21 @@ const routes: Routes = [
   },
   {
     path: 'profile',
-    loadChildren: () => import('./pages/profile/profile.module').then( m => m.ProfilePageModule)
+    loadChildren: () => import('./pages/profile/profile.module').then(m => m.ProfilePageModule),
+    canActivate: [AuthGuard, ActiveGuard]
   },
   {
     path: 'profile-update',
     loadChildren: () => import('./pages/profile-update/profile-update.module').then( m => m.ProfileUpdatePageModule)
+  },
+  {
+    path: 'activate-account',
+    loadChildren: () => import('./pages/activate-account/activate-account.module').then(m => m.ActivateAccountPageModule),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'reset-password',
+    loadChildren: () => import('./pages/reset-password/reset-password.module').then( m => m.ResetPasswordPageModule)
   },
 ];
 

@@ -26,7 +26,10 @@ class User extends Authenticatable
         'about',
         'gender',
         'birthday',
-        'avatar'
+        'avatar',
+        'confirmation_code',
+        'new_password_code',
+        'uuid', 'active'
     ];
 
     /**

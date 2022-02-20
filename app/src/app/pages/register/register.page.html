@@ -9,6 +9,13 @@
 
 <ion-content>
 
+    <div class="error-box">
+        <p class="error_input" *ngFor="let item of errors">
+            {{ item.msg }}
+        </p>
+    </div>
+
+
     <ion-list>
         <ion-item>
             <ion-label position="floating">Nome de usuário</ion-label>

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ToastController } from '@ionic/angular';
+import { LoadingController, ToastController } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth.service';
 import { Storage } from '@ionic/storage-angular';
 
@@ -20,10 +20,13 @@ export class RegisterPage implements OnInit {
   usernameExistsError: string = "";
   canRegister: boolean = false;
 
+  errors: any[];
+
   constructor(private router: Router,
     private authService: AuthService,
     private toastController: ToastController,
-    private storage: Storage
+    private storage: Storage,
+    private loadingController: LoadingController
   ) { }
 
   async ngOnInit() {
@@ -35,6 +38,8 @@ export class RegisterPage implements OnInit {
   }
 
   async registerUser() {
+    console.log("Yoooooooooooo");
+    
     if (this.username == "" || this.password == "" 
     || this.usernameExistsError != "" || this.phoneExistsError != "") {
       const toast = await this.toastController.create({
@@ -47,23 +52,39 @@ export class RegisterPage implements OnInit {
         message: 'Confirme sua Palavra-passe por favor.',
         duration: 2000
       });
+      toast.present();
     } else {
+
       let body = {
         action: 'register',
         username: this.username,
         phone: this.phone,
         password: this.password
       };
-      this.authService.postData(body, 'api/register').subscribe(async (data: any) => {
-        let alertmsg = data.msg;
 
-        console.log("Dados", data.original);
-        data = data.original;
+      const loading = await this.loadingController.create({
+        cssClass: 'my-custom-class',
+        message: 'Carregando...',
+      });
+
+      await loading.present();
+
+      this.authService.register(body).then(async (res: any) => {
+      
+        await loading.dismiss();
+
+        let data = res.data.original;
+        let alertmsg = data.msg
 
         if (data.success) {
           this.storage.set('session_storage', data.result[0]); // create storage
 
-          this.router.navigate(['/']);
+          window.location.href = "/"
+
+          // reset data
+          this.username = "";
+          this.phone = "";
+          this.password = "";
 
           const toast = await this.toastController.create({
             message: 'Parabéns!!! Sua conta foi criada com sucesso.',
@@ -72,31 +93,21 @@ export class RegisterPage implements OnInit {
           toast.present();
 
         } else {
-          const toast = await this.toastController.create({
-            message: alertmsg,
-            duration: 2000
-          });
-          toast.present();
-        }
 
-        // if (data.success) {
-        //   this.router.navigate(['/login']);
-        //   const toast = await this.toastController.create({
-        //     message: 'Parabéns!!! Sua conta foi criada com sucesso.',
-        //     duration: 2000
-        //   });
-        //   toast.present();
-        // } else {
-        //   const toast = await this.toastController.create({
-        //     message: alertmsg,
-        //     duration: 2000
-        //   });
-        //   toast.present();
-        // }
+
+          var keys = Object.keys(data.errors);
+
+          this.errors = [];
+          keys.forEach(key => {
+            console.log(data.errors[key]);
+            this.errors.push({ msg: data.errors[key][0]})
+          });
+
+        }
 
       });
 
-    } // if everything is correct end here...
+    } 
   }
 
   async checkUsername() {
@@ -104,9 +115,9 @@ export class RegisterPage implements OnInit {
     let body = {
       username: this.username,
     };
-    this.authService.postData(body, 'api/checkusername').subscribe(async (data: any) => {
+    this.authService.checkusername(body).then(async (res: any) => {
 
-      data = data.original;
+      let data = res.data.original;
       this.usernameExistsError = data.msg;
 
     });
@@ -117,9 +128,9 @@ export class RegisterPage implements OnInit {
     let body = {
       phone: this.phone,
     };
-    this.authService.postData(body, 'api/checkphone').subscribe(async (data: any) => {
+    this.authService.checkphone(body).then(async (res: any) => {
 
-      data = data.original;
+      let data = res.data.original;
       this.phoneExistsError = data.msg;
 
     });

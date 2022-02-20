@@ -29,6 +29,10 @@ class CreateUsersTable extends Migration
             $table->integer('active')->default(1);
             $table->text('about')->nullable();
 
+            $table->text('confirmation_code')->nullable();
+            $table->text('new_password_code')->nullable();
+            $table->timestamp('confirmation_date_sent')->nullable();
+
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();

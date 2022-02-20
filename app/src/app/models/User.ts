@@ -14,4 +14,5 @@ export class User {
     updated_at?: string;
     image?: string;
     about: string;
+    active: number;
 }

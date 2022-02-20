@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AlertController, ToastController } from '@ionic/angular';
+import { AlertController, LoadingController, ToastController } from '@ionic/angular';
 import { Storage } from '@ionic/storage-angular';
 import { User } from 'src/app/models/User';
 import { AuthService } from 'src/app/services/auth.service';
@@ -18,11 +18,16 @@ export class ProfilePage implements OnInit {
   private user: User;
   private file: string = '';
 
+  password: string = '';
+  npassword: string = '';
+  cpassword: string = '';
+
   constructor(private router: Router,
     private authService: AuthService,
     private toastCtrl: ToastController,
     private storage: Storage,
-    private alertCtrl: AlertController
+    private alertCtrl: AlertController,
+    public loadingController: LoadingController
   ) {
     this.user = new User();
   }
@@ -56,7 +61,7 @@ export class ProfilePage implements OnInit {
   }
 
   // On file Select
-  onInputFileChange(event) {
+  async onInputFileChange(event) {
     this.file = event.target.files[0];
     console.log(this.file);
 
@@ -67,16 +72,24 @@ export class ProfilePage implements OnInit {
     formData.append("file", this.file);
     formData.append("id", String(this.user.id));
 
+    const loading = await this.loadingController.create({
+      cssClass: 'my-custom-class',
+      message: 'Carregando...',
+    });
+    
+    
+    await loading.present();
+
     this.authService.updateAvatar(formData).then(async (res: any) => {
       let data = res.data.original; 
-      
-      console.log("dados: ", data);
 
+      await loading.dismiss();
+      
       if (data.success) {
 
         const alert = await this.alertCtrl.create({
           cssClass: 'my-custom-class',
-          header: 'Foto Atualizada!!',
+          header: 'Perfeito!!',
           message: data.msg,
           buttons: ['OK']
         });
@@ -97,14 +110,23 @@ export class ProfilePage implements OnInit {
   // update user
   async updateUser() {
     
-    this.authService.postData(this.user, 'api/update-user').subscribe(async (data: any) => {
-      data = data.original;
+    const loading = await this.loadingController.create({
+      cssClass: 'my-custom-class',
+      message: 'Carregando...',
+    });
+
+    await loading.present();
+
+    this.authService.updateProfile(this.user).then(async (data: any) => {
+      data = data.data.original;
+      
+      await loading.dismiss();
 
       if (data.success) {
 
         const alert = await this.alertCtrl.create({
           cssClass: 'my-custom-class',
-          header: 'Boas!! ' + data.result[0].name,
+          header: 'Perfeito!',
           message: data.msg,
           buttons: ['OK']
         });
@@ -119,7 +141,122 @@ export class ProfilePage implements OnInit {
         this.storage.set('session_storage', data.result[0]); // create storage
         this.router.navigate(['/home'])
 
+      } else {
+
+        const alert = await this.alertCtrl.create({
+          cssClass: 'my-custom-class',
+          header: 'Atenção!',
+          message: data.msg,
+          buttons: ['OK']
+        });
+
+        await alert.present();
+
       }
     })
+  }
+
+  async updatePassword() {
+
+    let data = {
+      password: this.password,
+      npassword: this.npassword,
+      cpassword: this.cpassword,
+      userid: this.user.id,
+    }
+
+    const loading = await this.loadingController.create({
+      cssClass: 'my-custom-class',
+      message: 'Carregando...',
+    });
+
+    await loading.present();
+
+    this.authService.updatePassword(data).then(async (res: any) => {
+      let data = res.data.original;
+
+      console.log(data);
+      
+      await loading.dismiss();
+
+      if (data.success) {
+
+        const alert = await this.alertCtrl.create({
+          cssClass: 'my-custom-class',
+          header: 'Pefeito!!',
+          message: data.msg,
+          buttons: ['OK']
+        });
+
+        await alert.present();
+
+        // reset change password fields
+        this.password = "";
+        this.npassword = "";
+        this.cpassword = "";
+      } else {
+
+        const alert = await this.alertCtrl.create({
+          cssClass: 'my-custom-class',
+          header: 'Opps!!',
+          message: data.msg,
+          buttons: ['OK']
+        });
+
+        await alert.present();
+      }
+    })
+  }
+
+  async deleteAccount() {
+    const alert = await this.alertCtrl.create({
+      cssClass: 'my-custom-class',
+      header: 'Atenção!',
+      message: "Tens a certeza que queres apagar sua conta?",
+      buttons: [
+        {
+          text: 'Não',
+          role: 'cancel',
+          cssClass: 'secondary',
+          id: 'cancel-button',
+          handler: (blah) => {
+            console.log('Confirm Cancel: blah');
+          }
+        }, {
+          text: 'Sim, confirmo',
+          id: 'confirm-button',
+          handler: async () => {
+
+            const loading = await this.loadingController.create({
+              cssClass: 'my-custom-class',
+              message: 'Carregando...',
+            });
+
+            await loading.present();
+
+            this.authService.deleteAccount(this.user).then( async (data) => {
+              
+              data = data.data.original;
+
+              await loading.dismiss();
+
+              if (data.success) { 
+                this.storage.clear();
+                this.router.navigate(['/login'])
+              } else {
+                const toast = await this.toastCtrl.create({
+                  message: 'Ocorreu um erro.',
+                  duration: 2000
+                });
+                toast.present();
+              }             
+              
+            });
+          }
+        }
+      ]
+    });
+
+    await alert.present();
   }
 }

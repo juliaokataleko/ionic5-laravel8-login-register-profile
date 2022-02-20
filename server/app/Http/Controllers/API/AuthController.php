@@ -4,59 +4,58 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use App\SMS\SMSApi;
 use Illuminate\Http\Request;
 use Ramsey\Uuid\Uuid;
 
 class AuthController
 {
-    private $postJson;
 
-    public function __construct()
+    public function login(Request $request)
     {
-        $postjson = json_decode(file_get_contents('php://input'), true);
-        $this->postJson = $postjson;
-    }
-
-    public function login()
-    {
-        $postjson = json_decode(file_get_contents('php://input'), true);
-
-        $user = User::where('username', $postjson['username'])
-            ->orWhere('phone', $postjson['username'])
-            ->orWhere('email', $postjson['username'])
+        $user = User::where('username', $request->username)
+            ->orWhere('phone', $request->username)
+            ->orWhere('email', $request->username)
             // ->where('password', $postjson['password'])
             ->first();
 
-        return $this->logginProcess($user);
+        return $this->logginProcess($request, $user);
     }
 
-    public function register()
+    public function register(Request $request)
     {
-        $postjson = json_decode(file_get_contents('php://input'), true);
+        $data = $request->validate([
+            // 'name' => 'required',
+            'username' => 'required',
+            'phone' => 'required',
+            'password' => 'required|min:5',
+        ]);
 
-        $data = [
-            'name' => $postjson['username'],
-            'username' => $postjson['username'],
-            'phone' => $postjson['phone'],
-            'password' => bcrypt($postjson['password']),
-        ];
+        $data['name'] = $data['username'];
 
+        $data['password'] = bcrypt($data['password']);
         $data['uuid'] = Uuid::uuid4();
+        $data['active'] = 0;
 
         // check if username and phone exists
 
+        $data['confirmation_code'] = rand(1000, 9999);
+        $data['confirmation_date_sent'] = now();
+
         $user = User::create($data);
 
-        return $this->logginProcess($user, true);
+        // send confirmation code
+        $sms = new SMSApi();
+        $sms->confirmationCode($user);
+
+        return $this->logginProcess($request, $user, true);
     }
 
-    public function logginProcess($user, $newUser = false)
+    public function logginProcess(Request $request, $user, $newUser = false)
     {
         $logged = false;
-        $postjson = $this->postJson;
-
         if (!is_null($user)) {
-            if (password_verify($postjson['password'], $user->password)) {
+            if (password_verify($request->password, $user->password)) {
                 $logged = true;
             }
         }
@@ -82,9 +81,9 @@ class AuthController
         ]);
     }
 
-    public function checkUsername()
+    public function checkUsername(Request $request)
     {
-        $checkUsername = User::where('username', $this->postJson['username'])->first();
+        $checkUsername = User::where('username', $request->username)->first();
 
         if (!is_null($checkUsername)) {
             return response()->json([
@@ -94,13 +93,14 @@ class AuthController
         } else {
             return response()->json([
                 'user_exists' => false,
+                'msg' => ""
             ]);
         }
     }
 
-    public function checkPhone()
+    public function checkPhone(Request $request)
     {
-        $checkUsername = User::where('phone', $this->postJson['phone'])->first();
+        $checkUsername = User::where('phone', $request->phone)->first();
 
         if (!is_null($checkUsername)) {
             return response()->json([
@@ -110,38 +110,60 @@ class AuthController
         } else {
             return response()->json([
                 'phone_exists' => false,
+                'msg' => ""
             ]);
         }
     }
 
     public function update(Request $request)
     {
-        $user = User::find($this->postJson['id']);
-
-        // echo ($this->postJson['file']);
-        // echo $request->file;
+        $user = User::find($request->id);
 
         if (!is_null($user)) {
-            $data = [
-                'name' => $this->postJson['name'],
-                'username' => $this->postJson['username'],
-                'phone' => $this->postJson['phone'],
-                'about' => $this->postJson['about'],
-                'gender' => $this->postJson['gender'],
-                'birthday' => $this->postJson['birthday'],
-            ];
+            $data = $request->validate([
+                'name' => 'required',
+                'username' => 'required',
+                'email' => 'nullable',
+                'phone' => 'nullable',
+                'about' => 'nullable',
+                'gender' => 'nullable',
+                'birthday' => 'nullable',
+            ]);
+
+            // check username
+            $userName = User::where('id', '!=', $user->id)
+            ->where('username', $data['username'])->first();
+
+            if(!is_null($userName)) {
+                return response()->json([
+                    'success' => false,
+                    'msg' => "Este nome de usuário já está sendo usado."
+                ]);
+            }
+
+            // check phone
+            $userPhone = User::where('id', '!=', $user->id)
+            ->where('phone', $data['phone'])->first();
+
+            if (!is_null($userPhone)) {
+                return response()->json([
+                    'success' => false,
+                    'msg' => "Este telefone já está sendo usado."
+                ]);
+            }
+
+            // check email
+            $userEmail = User::where('id', '!=', $user->id)
+            ->where('email', $data['email'])->first();
+
+            if (!is_null($userEmail)) {
+                return response()->json([
+                    'success' => false,
+                    'msg' => "Este email já está sendo usado."
+                ]);
+            }
 
             $user->update($data);
-
-            // echo json_encode($request->all());
-
-            // if ($request->hasFile('file') && $request->file('file')->isValid()) {
-            //     echo "Yahhhh";
-            //     $this->updateAvatar($request, $user);
-            // } else {
-            //     var_dump($_FILES['file']);
-            //     echo $this->postJson['file'];
-            // }
 
             $users = User::where('id', $user->id)->get();
             $userRes = UserResource::collection($users);
@@ -244,6 +266,64 @@ class AuthController
         return response()->json([
             'success' => false,
             'msg' => "Alguma coisa correu mal."
+        ]);
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $user = User::find($request->userid);
+        $password = $request->password;
+        $npassword = $request->npassword;
+        $cpassword = $request->cpassword;
+
+        if(!empty($password)) {
+            if (password_verify($password, $user->password)) {
+                
+                if(strlen($npassword) > 4 && $npassword == $cpassword ) {
+                    $user->password = bcrypt($npassword);
+                    $user->save();
+                    
+                    return response()->json([
+                        'success' => true,
+                        'msg' => "Senha alterada com sucesso."
+                    ]);
+                } else {
+                    return response()->json([
+                        'success' => false,
+                        'msg' => "A nova senha deve ter no mínimo 5 caracteres e precisa ser confirmada."
+                    ]);
+                }
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'msg' => "A senha atual está incorreta."
+                ]);
+            }
+        } else {
+            return response()->json([
+                'success' => false,
+                'msg' => "Por favor informe a nova senha."
+            ]);
+        }
+
+    }
+
+    public function deleteAccount(Request $request)
+    {
+        $user = User::where('uuid', $request->uuid)->first();
+
+        if(!is_null($user)) {
+            // delete user and related data
+            $user->delete();
+            return response()->json([
+                'success' => true,
+                'msg' => "Usuário excluído"
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'msg' => "Usuário não foi encontrado"
         ]);
     }
 }
