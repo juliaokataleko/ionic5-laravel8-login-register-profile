@@ -21,6 +21,7 @@
                         <th>Username</th>
                         <th>Email</th>
                         <th>Telefone</th>
+                        <th>Código de Confirmação</th>
                         <th>Activo</th>
                         <th>Ações</th>
                     </tr>
@@ -34,6 +35,7 @@
                         <td>{{ $user->username }}</td>
                         <td>{{ $user->email }}</td>
                         <td>{{ $user->phone }}</td>
+                        <td> {{ $user->confirmation_code }} </td>
                         <td>{{ $user->active }}</td>
                         <td>{{ $user->uuid }}</td>
                     </tr>

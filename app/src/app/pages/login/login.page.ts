@@ -25,6 +25,7 @@ export class LoginPage implements OnInit {
 
   async ngOnInit() {
     await this.storage.create();
+    this.storage.clear();
   }
 
   formRegister() {
@@ -55,13 +56,12 @@ export class LoginPage implements OnInit {
 
         if (data.success) {
           this.storage.set('session_storage', data.result[0]); // create storage
-          this.router.navigate(['/']);
-
+          // this.router.navigate(['/']);
           // reste data
           this.username = "";
           this.password = "";
 
-          window.location.href = "/"
+          this.router.navigate(['/home']);
         } else {
           const toast = await this.toastController.create({
             message: alertmsg,

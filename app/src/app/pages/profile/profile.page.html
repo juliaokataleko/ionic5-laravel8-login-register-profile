@@ -26,7 +26,7 @@
                 <input (change)="onInputFileChange($event)" type="file" style="display: none;" id="file" [(ngModel)]="name" />
             </ion-item>
 
-            <h4>Olá {{ user.name }}</h4>
+            <h4>@{{ user.name }}</h4>
             <p>{{ user.about ? user.about : 'Sem descrição'}}</p>
             <small><b>Idade: </b> {{ user.age }} anos </small>
         </ion-card>

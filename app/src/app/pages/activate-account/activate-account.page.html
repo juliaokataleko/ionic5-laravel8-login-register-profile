@@ -1,5 +1,5 @@
 <ion-header>
-    <ion-toolbar>
+    <ion-toolbar color="primary">
         <ion-buttons slot="start">
             <ion-back-button defaultHref="home"></ion-back-button>
         </ion-buttons>
@@ -7,7 +7,7 @@
             Ativar conta
         </ion-title>
         <ion-buttons slot="primary">
-            <ion-button color="primary-contrast" (click)="logout()">
+            <ion-button color="light" (click)="logout()">
                 <ion-icon slot="start" name="log-out"></ion-icon>
             </ion-button>
         </ion-buttons>
@@ -15,5 +15,27 @@
 </ion-header>
 
 <ion-content>
+
+    <ion-card>
+        <p>Por favor insere o código que recebeu</p>
+        <ion-list>
+            <ion-item>
+                <ion-label>Código</ion-label>
+                <ion-input maxlength="4" (keyup)="tryToActivateAccount()" [(ngModel)]="confirmation_code" placeholder="Digite o código"></ion-input>
+            </ion-item>
+            <ion-item>
+                <ion-button color="primary" (click)="tryToActivateAccount(true)">Validar</ion-button>
+            </ion-item>
+        </ion-list>
+
+        <p><b>Telefone: {{ user.phone }}</b></p>
+    </ion-card>
+
+    <ion-card>
+        <ion-item>
+            <p>Ainda não recebeu o código? reenviar...</p>
+            <ion-button color="primary" (click)="resendCCode()">Reenviar</ion-button>
+        </ion-item>
+    </ion-card>
 
 </ion-content>

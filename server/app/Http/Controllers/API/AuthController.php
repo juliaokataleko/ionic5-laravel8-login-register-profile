@@ -302,7 +302,7 @@ class AuthController
         } else {
             return response()->json([
                 'success' => false,
-                'msg' => "Por favor informe a nova senha."
+                'msg' => "Por favor informe a senha atual."
             ]);
         }
 
@@ -315,6 +315,58 @@ class AuthController
         if(!is_null($user)) {
             // delete user and related data
             $user->delete();
+            return response()->json([
+                'success' => true,
+                'msg' => "Usuário excluído"
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'msg' => "Usuário não foi encontrado"
+        ]);
+    }
+
+    public function activate(Request $request)
+    {
+        $user = User::where('uuid', $request->uuid)->first();
+
+        if (!is_null($user)) {
+            // delete user and related data
+
+            $timestamp1 = strtotime($user->confirmation_date_sent);
+            $timestamp2 = strtotime(now());
+            $hour = abs($timestamp2 - $timestamp1) / (60 * 60);
+
+            if($user->confirmation_code == $request->confirmation_code) {
+                // check the date
+                
+                if($hour >= 1) {
+                    return response()->json([
+                        'success' => false,
+                        'msg' => "Código expirado. Reenviar"
+                    ]);
+                
+                } else {
+
+                    $user->active = 1;
+                    $user->save();
+
+                    $users = User::where('id', $user->id)->get();
+                    $userRes = UserResource::collection($users);
+
+                    return response()->json([
+                        'success' => true,
+                        'msg' => "Conta ativada com sucesso. Obrigado por se juntar na nossa comunidade.",
+                        'result' => $userRes
+                    ]);
+                }
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'msg' => "Código incorreto. Hora: " . $hour
+                ]);
+            }
             return response()->json([
                 'success' => true,
                 'msg' => "Usuário excluído"

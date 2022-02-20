@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 // import 'rxjs/Rx';
 import { Storage } from '@ionic/storage-angular';
 import { User } from '../models/User';
+import { environment } from 'src/environments/environment';
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -20,7 +21,8 @@ const httpOptions = {
 })
 export class AuthService {
 
-  server = "http://192.168.88.243:8000/"
+  server = environment.apiUrl;
+
   public isUserLoggedIn: boolean = false;
   public userLoogedActive: boolean = false;
 
@@ -50,6 +52,7 @@ export class AuthService {
   // }
 
   register(data): Promise<any> {
+
     let route = this.server + 'api/register'
     return axios
       .post(route, data)
@@ -99,7 +102,6 @@ export class AuthService {
   }
 
   // check if username exists
-  
   checkusername(data): Promise<any> {
     let route = this.server + 'api/checkusername'
     return axios
@@ -113,7 +115,6 @@ export class AuthService {
   }
 
   // check if phone exists
-
   checkphone(data): Promise<any> {
     let route = this.server + 'api/checkphone'
     return axios
@@ -153,7 +154,7 @@ export class AuthService {
   userLoogedActiveted(): Promise<any> {
     return this.storage.get('session_storage').then((res) => {
 
-      if (res.active == 1) return true;
+      if (res != null && res.active == 1) return true;
       return false;
     })
   }
@@ -166,5 +167,17 @@ export class AuthService {
     })
   }
   
+  // activate the account
+  activateAccount(data): Promise<any> {
+    let route = this.server + "api/activate"
+    return axios
+      .post(route, data)
+      .then((res) => {
+        return res;
+      })
+      .catch((error) => {
+
+      });
+  }
 }
 

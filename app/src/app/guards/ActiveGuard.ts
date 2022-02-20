@@ -15,7 +15,7 @@ export class ActiveGuard implements CanActivate {
     canActivate(): boolean | Observable<boolean> | Promise<boolean> {
 
         return this.authService.userLoogedActiveted().then(data => {
-            console.log("Data ", data);
+            console.log("Is active ", data);
             
             if (!data) {
                 this.router.navigate(['/activate-account']);

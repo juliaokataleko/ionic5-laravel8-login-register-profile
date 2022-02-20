@@ -29,7 +29,8 @@ class User extends Authenticatable
         'avatar',
         'confirmation_code',
         'new_password_code',
-        'uuid', 'active'
+        'uuid', 'active',
+        'confirmation_date_sent'
     ];
 
     /**

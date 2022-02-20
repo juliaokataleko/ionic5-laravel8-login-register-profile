@@ -29,3 +29,4 @@ Route::post('update-user', [AuthController::class, 'update'])->middleware('CORS'
 Route::post('update-avatar', [AuthController::class, 'uploadAvatar'])->middleware('CORS');
 Route::post('update-password', [AuthController::class, 'updatePassword'])->middleware('CORS');
 Route::post('delete-account', [AuthController::class, 'deleteAccount'])->middleware('CORS');
+Route::post('activate', [AuthController::class, 'activate'])->middleware('CORS');
