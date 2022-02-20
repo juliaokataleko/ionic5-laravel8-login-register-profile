@@ -186,25 +186,25 @@ class AuthController
 
                 if (move_uploaded_file($_FILES['file']['tmp_name'], "$path/" . $nome)) {
 
-                    $tipo = $_FILES['file']['type'];
+                    // $tipo = $_FILES['file']['type'];
 
-                    $tmpname = $nome;
+                    // $tmpname = $nome;
 
-                    list($width_orig, $height_orig) = getimagesize('uploads/users/' . $tmpname);
-                    $ratio = $width_orig / $height_orig;
+                    // list($width_orig, $height_orig) = getimagesize('uploads/users/' . $tmpname);
+                    // $ratio = $width_orig / $height_orig;
 
-                    $width = $width_orig;
-                    $height = $height_orig;
+                    // $width = $width_orig;
+                    // $height = $height_orig;
 
-                    $img = imagecreatetruecolor($width, $height);
-                    if ($tipo == 'image/jpeg') {
-                        $origi = imagecreatefromjpeg('uploads/users/' . $tmpname);
-                    } else if ($tipo == 'image/png') {
-                        $origi = imagecreatefrompng('uploads/users/' . $tmpname);
-                    }
+                    // $img = imagecreatetruecolor($width, $height);
+                    // if ($tipo == 'image/jpeg') {
+                    //     $origi = imagecreatefromjpeg('uploads/users/' . $tmpname);
+                    // } else if ($tipo == 'image/png') {
+                    //     $origi = imagecreatefrompng('uploads/users/' . $tmpname);
+                    // }
 
-                    imagecopyresampled($img, $origi, 0, 0, 0, 0, $width, $height, $width_orig, $height_orig);
-                    imagejpeg($img, 'uploads/users/' . $tmpname, 90);
+                    // imagecopyresampled($img, $origi, 0, 0, 0, 0, $width, $height, $width_orig, $height_orig);
+                    // imagejpeg($img, 'uploads/users/' . $tmpname, 90);
 
                     $user->update([
                         'avatar' => $nome
@@ -226,6 +226,24 @@ class AuthController
 
     public function uploadAvatar(Request $request)
     {
-        # code...
+        $user = User::find($request->id);
+
+        if ($request->hasFile('file') && $request->file('file')->isValid()) {
+            $this->updateAvatar($request, $user);
+
+            $users = User::where('id', $user->id)->get();
+            $userRes = UserResource::collection($users);
+
+            return response()->json([
+                'success' => true,
+                'msg' => "Conta atualizada",
+                'result' => $userRes
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'msg' => "Alguma coisa correu mal."
+        ]);
     }
 }

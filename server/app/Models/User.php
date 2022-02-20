@@ -53,7 +53,7 @@ class User extends Authenticatable
         if ($this->avatar && file_exists("uploads/users/" . $this->avatar)) :
             return url("/uploads/users/" . $this->avatar);
         else :
-            return url("/images/jfk.png");
+            return url("/images/person.png");
         endif;
     }
 }

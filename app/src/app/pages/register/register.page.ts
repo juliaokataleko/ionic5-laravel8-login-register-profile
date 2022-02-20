@@ -35,11 +35,12 @@ export class RegisterPage implements OnInit {
   }
 
   async registerUser() {
-    if (this.username == "" || this.password == "") {
+    if (this.username == "" || this.password == "" 
+    || this.usernameExistsError != "" || this.phoneExistsError != "") {
       const toast = await this.toastController.create({
         message: 'Preencha todos os campos correctamente.',
         duration: 2000
-      });
+      }); 
       toast.present();
     } else if (this.password != this.confirm_password) {
       const toast = await this.toastController.create({

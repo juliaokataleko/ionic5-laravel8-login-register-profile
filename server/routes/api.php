@@ -25,3 +25,4 @@ Route::post('register', [AuthController::class, 'register'])->middleware('CORS')
 Route::post('checkusername', [AuthController::class, 'checkUsername'])->middleware('CORS');
 Route::post('checkphone', [AuthController::class, 'checkPhone'])->middleware('CORS');
 Route::post('update-user', [AuthController::class, 'update'])->middleware('CORS');
+Route::post('update-avatar', [AuthController::class, 'uploadAvatar'])->middleware('CORS');

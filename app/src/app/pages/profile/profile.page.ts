@@ -59,10 +59,6 @@ export class ProfilePage implements OnInit {
   onInputFileChange(event) {
     this.file = event.target.files[0];
     console.log(this.file);
-  }
-
-  // update user
-  async updateUser() {
 
     // Create form data
     let formData: FormData = new FormData();
@@ -70,16 +66,36 @@ export class ProfilePage implements OnInit {
     // Store form name as "file" with file data
     formData.append("file", this.file);
     formData.append("id", String(this.user.id));
-    formData.append("uuid", this.user.uuid);
-    formData.append("name", this.user.name);
-    formData.append("username", this.user.username);
-    formData.append("email", this.user.email);
-    formData.append("phone", this.user.phone);
-    formData.append("gender", this.user.gender);
-    formData.append("birthday", this.user.birthday);
 
-    console.log("Usuário...", this.user);
-    
+    this.authService.updateAvatar(formData).then(async (res: any) => {
+      let data = res.data.original; 
+      
+      console.log("dados: ", data);
+
+      if (data.success) {
+
+        const alert = await this.alertCtrl.create({
+          cssClass: 'my-custom-class',
+          header: 'Foto Atualizada!!',
+          message: data.msg,
+          buttons: ['OK']
+        });
+
+        await alert.present();
+
+        // const { role } = await alert.onDidDismiss();
+        // console.log('onDidDismiss resolved with role', role);
+
+        this.storage.clear();
+        this.storage.set('session_storage', data.result[0]); // create storage
+        this.router.navigate(['/home'])
+
+      }
+    })
+  }
+
+  // update user
+  async updateUser() {
     
     this.authService.postData(this.user, 'api/update-user').subscribe(async (data: any) => {
       data = data.original;

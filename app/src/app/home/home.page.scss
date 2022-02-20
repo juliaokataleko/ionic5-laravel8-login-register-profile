@@ -27,6 +27,9 @@ ion-card {
     padding: 18px;
     text-align: center;
     img {
-        border-radius: 50%;
+        border-radius: 5px;
+        width: 300px;
+        height: 300px;
+        object-fit: cover;
     }
 }

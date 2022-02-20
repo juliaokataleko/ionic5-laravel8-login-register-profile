@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import axios from 'axios';
 // import 'rxjs/Rx';
 
 const httpOptions = {
@@ -23,6 +24,18 @@ export class AuthService {
   postData(body, file) {
     return this.http.post(this.server + file, JSON.stringify(body),
       httpOptions);
+  }
+
+  updateAvatar(data): Promise<any> {
+    let route = this.server + "api/update-avatar"
+    return axios
+      .post(route, data)
+      .then((res) => {
+        return res;
+      })
+      .catch((error) => {
+        
+      });
   }
 }
 
