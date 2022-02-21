@@ -30,3 +30,6 @@ Route::post('update-avatar', [AuthController::class, 'uploadAvatar'])->middlewar
 Route::post('update-password', [AuthController::class, 'updatePassword'])->middleware('CORS');
 Route::post('delete-account', [AuthController::class, 'deleteAccount'])->middleware('CORS');
 Route::post('activate', [AuthController::class, 'activate'])->middleware('CORS');
+Route::post('account-recover', [AuthController::class, 'recover'])->middleware('CORS');
+Route::post('account-reset', [AuthController::class, 'reset'])->middleware('CORS');
+Route::post('resend-code', [AuthController::class, 'resendCode'])->middleware('CORS');

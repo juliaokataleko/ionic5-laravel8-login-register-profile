@@ -11,17 +11,6 @@ use Ramsey\Uuid\Uuid;
 class AuthController
 {
 
-    public function login(Request $request)
-    {
-        $user = User::where('username', $request->username)
-            ->orWhere('phone', $request->username)
-            ->orWhere('email', $request->username)
-            // ->where('password', $postjson['password'])
-            ->first();
-
-        return $this->logginProcess($request, $user);
-    }
-
     public function register(Request $request)
     {
         $data = $request->validate([
@@ -49,6 +38,17 @@ class AuthController
         $sms->confirmationCode($user);
 
         return $this->logginProcess($request, $user, true);
+    }
+
+    public function login(Request $request)
+    {
+        $user = User::where('username', $request->username)
+            ->orWhere('phone', $request->username)
+            ->orWhere('email', $request->username)
+            // ->where('password', $postjson['password'])
+            ->first();
+
+        return $this->logginProcess($request, $user);
     }
 
     public function logginProcess(Request $request, $user, $newUser = false)
@@ -332,7 +332,6 @@ class AuthController
         $user = User::where('uuid', $request->uuid)->first();
 
         if (!is_null($user)) {
-            // delete user and related data
 
             $timestamp1 = strtotime($user->confirmation_date_sent);
             $timestamp2 = strtotime(now());
@@ -377,5 +376,158 @@ class AuthController
             'success' => false,
             'msg' => "Usuário não foi encontrado"
         ]);
+    }
+
+    public function recover(Request $request)
+    {
+        $user_name = $request->username;
+        // $user_name = str_replace('+', '', $user_name);
+        // $user_name = trim($user_name);
+
+        $user = User::where('username', $user_name)
+            ->orWhere('phone', $user_name)
+            ->orWhere('email', $user_name)
+            // ->where('password', $postjson['password'])
+            ->first();
+
+        if(!is_null($user)) {
+            // send recover code
+
+            $data['confirmation_code'] = rand(1000, 9999);
+            $data['confirmation_date_sent'] = now();
+
+            $user->update($data);
+
+            // send confirmation code
+            $sms = new SMSApi();
+            $message = $sms->confirmationCode($user);
+
+
+            // if ($message->getStatus() == 0) {
+
+            // return the user
+            $users = User::where('id', $user->id)->get();
+            $userRes = UserResource::collection($users);
+
+            return response()->json([
+                'success' => true,
+                'msg' => "Código de recuperação enviado para o seu telefone.<hr>Verifique seu telemóvel e coloque o código a baixo.",
+                'result' => $userRes
+            ]);
+
+            // } else {
+            //     return response()->json([
+            //         'success' => false,
+            //         'msg' => "Ocorreu um erro écnico. Tente novamente."
+            //     ]);
+            // }
+            
+
+        } else {
+            return response()->json([
+                'success' => false,
+                'msg' => "Não foi encontrado um usuário com a informação fornecida."
+            ]);
+        }
+    }
+
+    public function reset(Request $request)
+    {
+        $data = $request->validate([
+            'password' => 'min:5'
+        ]);
+
+        $user_name = $request->username;
+        // $user_name = str_replace('+', '', $user_name);
+        // $user_name = trim($user_name);
+
+        $user = User::where('username', $user_name)
+            ->orWhere('phone', $user_name)
+            ->orWhere('email', $user_name)
+            // ->where('password', $postjson['password'])
+            ->first();
+
+        if (!is_null($user)) {
+            // reset account
+
+            $timestamp1 = strtotime($user->confirmation_date_sent);
+            $timestamp2 = strtotime(now());
+            $hour = abs($timestamp2 - $timestamp1) / (60 * 60);
+
+            if ($user->confirmation_code == $request->code) {
+                // check the date
+
+                if ($hour >= 1
+                ) {
+                    return response()->json([
+                        'success' => false,
+                        'msg' => "Código expirado. Reenviar"
+                    ]);
+                } else {
+
+                    $user->password = bcrypt($request->password);
+                    $user->save();
+
+                    $users = User::where('id', $user->id)->get();
+                    $userRes = UserResource::collection($users);
+
+                    return response()->json([
+                        'success' => true,
+                        'msg' => "Conta recuperada com sucesso.",
+                        'result' => $userRes
+                    ]);
+                }
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'msg' => "Código incorreto." 
+                ]);
+            }           
+
+        } else {
+            return response()->json([
+                'success' => false,
+                'msg' => "$user_name - Não foi encontrado um usuário com a informação fornecida."
+            ]);
+        }
+    }
+
+    public function resendCode(Request $request)
+    {
+        $phone = $request->phone;
+
+        $user = User::where('phone', $phone)
+            ->first();
+
+        if (!is_null($user)) {
+            // send recover code
+
+            $data['confirmation_code'] = rand(1000, 9999);
+            $data['confirmation_date_sent'] = now();
+
+            $user->update($data);
+
+            // send confirmation code
+            $sms = new SMSApi();
+            $message = $sms->confirmationCode($user);
+
+            // if ($message->getStatus() == 0) {
+
+            // return the user
+            $users = User::where('id', $user->id)->get();
+            $userRes = UserResource::collection($users);
+
+            return response()->json([
+                'success' => true,
+                'msg' => "Código enviado para o seu telefone.<hr>Verifique seu telemóvel e informe o código.",
+                'result' => $userRes
+            ]);
+
+        } else {
+            return response()->json([
+                'success' => false,
+                'msg' => "Não foi encontrado um usuário com a informação fornecida."
+            ]);
+        }
     }
 }

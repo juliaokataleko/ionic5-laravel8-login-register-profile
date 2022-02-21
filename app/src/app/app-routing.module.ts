@@ -33,10 +33,6 @@ const routes: Routes = [
     canActivate: [AuthGuard, ActiveGuard]
   },
   {
-    path: 'profile-update',
-    loadChildren: () => import('./pages/profile-update/profile-update.module').then( m => m.ProfileUpdatePageModule)
-  },
-  {
     path: 'activate-account',
     loadChildren: () => import('./pages/activate-account/activate-account.module').then(m => m.ActivateAccountPageModule),
     canActivate: [AuthGuard]

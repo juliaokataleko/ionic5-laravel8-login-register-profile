@@ -1,9 +1,48 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>forgot</ion-title>
-  </ion-toolbar>
+    <ion-toolbar>
+        <ion-title>Recuperar conta</ion-title>
+        <ion-buttons slot="primary">
+            <ion-back-button text="Login" defaultHref="/login" icon="" color="tertiary" fill="outline"></ion-back-button>
+        </ion-buttons>
+    </ion-toolbar>
 </ion-header>
+
 
 <ion-content>
 
+    <div class="centered">
+
+        <div class="error-box">
+            <p class="error_input" *ngFor="let item of errors">
+                {{ item.msg }}
+            </p>
+        </div>
+
+        <div class="login">
+            <ion-label>Telefone ou Nome de usuário</ion-label>
+            <ion-input type="text" [disabled]="codeSent" [(ngModel)]="username"></ion-input>
+
+            <div *ngIf="codeSent">
+
+                <br>
+                <ion-label>Código recebido</ion-label>
+                <ion-input type="text" [(ngModel)]="code"></ion-input>
+                <a (click)="resetData()">Não recebi o código</a>
+                <br>
+                <ion-label>Informe a nova senha</ion-label>
+                <ion-input type="text" [(ngModel)]="npassword"></ion-input>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
 </ion-content>
+
+<ion-footer>
+    <ion-button *ngIf="codeSent" expland=" block " padding color="success " (click)="resetPassword()">Mudar senha
+    </ion-button>
+    <ion-button *ngIf="!codeSent" expland=" block " padding color="tertiary " (click)="recover() ">Recuperar conta</ion-button>
+</ion-footer>

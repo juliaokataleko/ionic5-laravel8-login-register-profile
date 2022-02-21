@@ -2,6 +2,7 @@
 
 use App\Models\User;
 use App\SMS\SMSApi;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,14 +16,19 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Auth::routes();
+
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('users', function() {
-    $users = User::all();
-    return view('dashboard.users.index', compact('users'));
+Route::group(['middleware'=>'auth', 'prefix' => '/dashboard'], function() {
+    Route::get('users', function () {
+        $users = User::paginate(15);
+        return view('dashboard.users.index', compact('users'));
+    })->name('users');
 });
+
 
 Route::get('test-sms', function() {
     
@@ -36,3 +42,6 @@ Route::get('test-sms', function() {
         echo "The message failed with status: " . $message->getStatus() . "\n";
     }
 });
+
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

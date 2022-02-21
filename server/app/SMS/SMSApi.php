@@ -25,7 +25,7 @@ class SMSApi {
 
     public function confirmationCode(User $user)
     {
-        $message = "Código: " . $user->confirmation_code . "! Olá {$user->name}";
+        $message = "Olá {$user->name}. Código: " . $user->confirmation_code;
         $phoneNumber = $user->phone;
         return $this->response($message, $phoneNumber);
     }

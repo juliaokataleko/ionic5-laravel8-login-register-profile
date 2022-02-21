@@ -179,5 +179,43 @@ export class AuthService {
 
       });
   }
+
+  // recover account 
+  recover(data): Promise<any> {
+    let route = this.server + "api/account-recover"
+    return axios
+      .post(route, data)
+      .then((res) => {
+        return res;
+      })
+      .catch((error) => {
+
+      });
+  }
+  // reset password
+  reset(data): Promise<any> {
+    let route = this.server + "api/account-reset"
+    return axios
+      .post(route, data)
+      .then((res) => {
+        return res;
+      })
+      .catch((error) => {
+
+      });
+  }
+
+  // resend code
+  resendCode(data): Promise<any> {
+    let route = this.server + "api/resend-code"
+    return axios
+      .post(route, data)
+      .then((res) => {
+        return res;
+      })
+      .catch((error) => {
+
+      });
+  }
 }
 

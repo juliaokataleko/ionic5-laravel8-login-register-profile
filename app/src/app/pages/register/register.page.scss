@@ -9,3 +9,16 @@
     font-size: 13px;
     color: #b34141;
 }
+
+.centered {
+    padding: 1em !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    .register {
+        width: 100%;
+    }
+}

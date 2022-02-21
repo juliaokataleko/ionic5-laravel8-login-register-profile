@@ -112,7 +112,48 @@ export class ActivateAccountPage implements OnInit {
   }
 
   async resendCCode() {
-    
+    let data = {
+      phone: this.user.phone
+    }
+
+    const loading = await this.loadingController.create({
+      cssClass: 'my-custom-class',
+      message: 'Carregando...',
+    });
+
+    await loading.present();
+
+    this.authService.resendCode(data).then(async (data) => {
+      data = data.data.original;
+
+      await loading.dismiss();
+
+      console.log("Dados...", data);
+
+      if (data.success) {
+
+        const alert = await this.alertCtrl.create({
+          cssClass: 'my-custom-class',
+          header: 'Perfeito!',
+          message: data.msg,
+          buttons: ['OK']
+        });
+
+        await alert.present();
+
+      } else {
+
+        const alert = await this.alertCtrl.create({
+          cssClass: 'my-custom-class',
+          header: 'Atenção!',
+          message: data.msg,
+          buttons: ['OK']
+        });
+
+        await alert.present();
+
+      }
+    });
   }
 
 }
