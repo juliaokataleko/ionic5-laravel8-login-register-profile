@@ -1,0 +1,17 @@
+ion-card {
+  padding: 10px;
+  text-align: center;
+}
+
+ion-card img {
+  border-radius: 5px;
+  width: 300px;
+  height: 300px;
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+
+.text-center {
+  text-align: center;
+}
+/*# sourceMappingURL=profile.page.css.map */

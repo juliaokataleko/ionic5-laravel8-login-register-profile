@@ -9,19 +9,21 @@
 
 <ion-content>
 
-    <div class="centered">
-
-        <div class="login">
-            <ion-label>Nome de usuário</ion-label>
-            <ion-input type="text" [(ngModel)]="username"></ion-input>
-            <br> <br>
-            <ion-label>Senha</ion-label>
+    <ion-list>
+        <ion-item>
+            <ion-label position="floating">Nome de usuário</ion-label>
+            <ion-input placeholder="login" type="text" [(ngModel)]="username"></ion-input>
+        </ion-item>
+        <ion-item>
+            <ion-label position="floating">Senha</ion-label>
             <ion-input type="password" [(ngModel)]="password"></ion-input>
+        </ion-item>
+    </ion-list>
 
-            <a routerLink="/forgot">Esqueci minha senha</a>
+    <br>
 
-        </div>
-
+    <div class="centered ">
+        <a routerLink="/forgot ">Esqueci minha senha</a>
     </div>
 
 

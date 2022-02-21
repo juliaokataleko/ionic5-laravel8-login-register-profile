@@ -1,0 +1,47 @@
+.centered {
+  padding: 1em !important;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  height: 100%;
+}
+
+ion-label {
+  font-size: 16px;
+  font-weight: 500;
+  margin-top: 2em !important;
+}
+
+ion-input {
+  border: 3px solid #0951eb;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+ion-footer {
+  padding: 10px;
+  text-align: center;
+}
+
+.login {
+  width: 100%;
+  padding: 2em 0;
+}
+
+.error_input {
+  display: block;
+  margin: 10px 0;
+  font-size: 15px;
+  color: #b34141;
+}
+/*# sourceMappingURL=forgot.page.css.map */

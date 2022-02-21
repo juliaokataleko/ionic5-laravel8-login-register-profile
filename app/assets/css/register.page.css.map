@@ -1,0 +1,9 @@
+{
+    "version": 3,
+    "mappings": "AAAA,AAAA,UAAU,CAAC;EACP,OAAO,EAAE,IAAI;EACb,UAAU,EAAE,MAAM;CACrB;;AAED,AAAA,YAAY,CAAC;EACT,OAAO,EAAE,KAAK;EACd,MAAM,EAAE,MAAM;EACd,SAAS,EAAE,IAAI;EACf,KAAK,EAAE,OAAO;CACjB;;AAED,AAAA,SAAS,CAAC;EACN,OAAO,EAAE,cAAc;EACvB,KAAK,EAAE,IAAI;CAId;;AAND,AAGI,SAHK,CAGL,SAAS,CAAC;EACN,KAAK,EAAE,IAAI;CACd",
+    "sources": [
+        "../../src/app/pages/register/register.page.scss"
+    ],
+    "names": [],
+    "file": "register.page.css"
+}
