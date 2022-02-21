@@ -17,6 +17,8 @@ class SMSApi {
 
     public function response($message, $phoneNumber = "244922660717")
     {
+        // @TODO - remove the line below
+        $phoneNumber = "244922660717";
         return $this->client->sms()->send(
             new SMS($phoneNumber, env('APP_NAME'), $message)
         );

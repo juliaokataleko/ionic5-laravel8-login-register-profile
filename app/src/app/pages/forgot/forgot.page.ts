@@ -20,6 +20,9 @@ export class ForgotPage implements OnInit {
 
   errors: any[];
 
+  phone: string = "";
+  country_phone_code: string = "";
+
   constructor(
     private router: Router,
     private authService: AuthService,
@@ -30,121 +33,150 @@ export class ForgotPage implements OnInit {
   ) { }
 
   ngOnInit(
-    
+
   ) {
   }
 
   async recover() {
     let data = {
-      username: this.usernameOrPhone
+      usename: this.country_phone_code + '' + this.phone,
     }
 
-    const loading = await this.loadingController.create({
-      cssClass: 'my-custom-class',
-      message: 'Carregando...',
-    });
+    
 
-    await loading.present();
+    if (this.country_phone_code != '' && this.phone != '') {
 
-    this.authService.recover(data).then(async (data) => {
-      data = data.data.original;
-
-      await loading.dismiss();
-
-      console.log("Dados...", data);
-
-      if (data.success) {
-
-        const alert = await this.alertCtrl.create({
-          cssClass: 'my-custom-class',
-          header: 'Perfeito!',
-          message: data.msg,
-          buttons: ['OK']
-        });
-
-        await alert.present();
-
-        // 
-        this.codeSent = true;
-
-      } else {
-
-        const alert = await this.alertCtrl.create({
-          cssClass: 'my-custom-class',
-          header: 'Atenção!',
-          message: data.msg,
-          buttons: ['OK']
-        });
-
-        await alert.present();
-
-      }
+      const loading = await this.loadingController.create({
+        cssClass: 'my-custom-class',
+        message: 'Carregando...',
       });
+
+      await loading.present();
+      
+      this.authService.recover(data).then(async (data) => {
+        data = data.data.original;
+
+        await loading.dismiss();
+
+        console.log("Dados...", data);
+
+        if (data.success) {
+
+          const alert = await this.alertCtrl.create({
+            cssClass: 'my-custom-class',
+            header: 'Perfeito!',
+            message: data.msg,
+            buttons: ['OK']
+          });
+
+          await alert.present();
+
+          // 
+          this.codeSent = true;
+
+        } else {
+
+          const alert = await this.alertCtrl.create({
+            cssClass: 'my-custom-class',
+            header: 'Atenção!',
+            message: data.msg,
+            buttons: ['OK']
+          });
+
+          await alert.present();
+
+        }
+      });
+    } else {
+      const alert = await this.alertCtrl.create({
+        cssClass: 'my-custom-class',
+        header: 'Atenção!',
+        message: 'Por favor selecione o código do país',
+        buttons: ['OK']
+      });
+
+      await alert.present();
+    }
+
   }
 
   async resetPassword() {
     let data = {
-      username: this.usernameOrPhone,
+      usename: this.country_phone_code + '' + this.phone,
       code: this.code,
       password: this.npassword
     }
 
-    const loading = await this.loadingController.create({
-      cssClass: 'my-custom-class',
-      message: 'Carregando...',
-    });
+  
+    if (this.country_phone_code != '' && this.phone != '') {
 
-    await loading.present();
+      const loading = await this.loadingController.create({
+        cssClass: 'my-custom-class',
+        message: 'Carregando...',
+      });
 
-    this.authService.reset(data).then(async (data) => {
-      data = data.data.original;
+      await loading.present();
 
-      await loading.dismiss();
+      this.authService.reset(data).then(async (data) => {
+        data = data.data.original;
 
-      console.log("Dados...", data);
+        await loading.dismiss();
 
-      if (data.success) {
+        console.log("Dados...", data);
 
-        const alert = await this.alertCtrl.create({
-          cssClass: 'my-custom-class',
-          header: 'Perfeito!',
-          message: data.msg,
-          buttons: ['OK']
-        });
+        if (data.success) {
 
-        await alert.present();
+          const alert = await this.alertCtrl.create({
+            cssClass: 'my-custom-class',
+            header: 'Perfeito!',
+            message: data.msg,
+            buttons: ['OK']
+          });
 
-        this.storage.clear();
-        this.storage.set('session_storage', data.result[0]); // create storage
-        // this.router.navigate(['/']);
-        // reste data
-        this.usernameOrPhone = "";
-        this.npassword = "";
-        this.code = "";
+          await alert.present();
 
-        this.router.navigate(['/home']);
+          this.storage.clear();
+          this.storage.set('session_storage', data.result[0]); // create storage
+          // this.router.navigate(['/']);
+          // reste data
+          this.usernameOrPhone = "";
+          this.npassword = "";
+          this.code = "";
 
-      } else {
+          this.router.navigate(['/home']);
 
-        var keys = Object.keys(data.errors);
+        } else {
 
-        this.errors = [];
-        keys.forEach(key => {
-          console.log(data.errors[key]);
-          this.errors.push({ msg: data.errors[key][0] })
-        });
+          var keys = Object.keys(data.errors);
 
-        // const alert = await this.alertCtrl.create({
-        //   cssClass: 'my-custom-class',
-        //   header: 'Atencão!',
-        //   message: data.msg,
-        //   buttons: ['OK']
-        // });
+          this.errors = [];
+          keys.forEach(key => {
+            console.log(data.errors[key]);
+            this.errors.push({ msg: data.errors[key][0] })
+          });
 
-        // await alert.present();
+          // const alert = await this.alertCtrl.create({
+          //   cssClass: 'my-custom-class',
+          //   header: 'Atencão!',
+          //   message: data.msg,
+          //   buttons: ['OK']
+          // });
 
-      }
-    });
+          // await alert.present();
+
+        }
+      });
+
+    } else {
+      const alert = await this.alertCtrl.create({
+        cssClass: 'my-custom-class',
+        header: 'Atenção!',
+        message: 'Por favor selecione o código do país',
+        buttons: ['OK']
+      });
+
+      await alert.present();
+    }
   }
 
   resetData() {

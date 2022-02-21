@@ -13,6 +13,10 @@ class AuthController
 
     public function register(Request $request)
     {
+        // return response()->json([
+        //     'data' => json_encode($request->all())
+        // ]);
+
         $data = $request->validate([
             // 'name' => 'required',
             'username' => 'required',

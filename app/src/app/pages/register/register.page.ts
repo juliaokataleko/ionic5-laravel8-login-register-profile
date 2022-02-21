@@ -19,6 +19,7 @@ export class RegisterPage implements OnInit {
   phoneExistsError: string = "";
   usernameExistsError: string = "";
   canRegister: boolean = false;
+  country_phone_code: string = '';
 
   errors: any[];
 
@@ -53,12 +54,17 @@ export class RegisterPage implements OnInit {
         duration: 2000
       });
       toast.present();
+    } else if (this.country_phone_code == '') {
+      const toast = await this.toastController.create({
+        message: 'Por favor selecione o país.',
+        duration: 2000
+      });
+      toast.present();
     } else {
 
       let body = {
-        action: 'register',
         username: this.username,
-        phone: this.phone,
+        phone: this.country_phone_code + '' +this.phone,
         password: this.password
       };
 
@@ -126,7 +132,7 @@ export class RegisterPage implements OnInit {
   async checkPhone() {
 
     let body = {
-      phone: this.phone,
+      phone: this.country_phone_code + '' + this.phone,
     };
     this.authService.checkphone(body).then(async (res: any) => {
 
